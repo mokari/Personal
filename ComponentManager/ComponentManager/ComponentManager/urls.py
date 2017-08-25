@@ -16,6 +16,7 @@ import app.views
 
 urlpatterns = [
     # Examples:
+    url(r'^signup/$', app.views.signup, name='signup'),
     url(r'^$', app.views.home, name='home'),
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about', app.views.about, name='about'),
