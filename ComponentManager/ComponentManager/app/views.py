@@ -60,3 +60,14 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'app/signup.html', {'form': form})
+
+def newModel(request):
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/newModel.html',
+        {
+            'title':'Create new Model',
+            'year':datetime.now().year,
+        }
+    )

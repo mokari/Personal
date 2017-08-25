@@ -55,6 +55,7 @@
     <Folder Include="ComponentManager\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\templates\app\newModel.html" />
     <Content Include="app\templates\app\signup.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
