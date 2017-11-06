@@ -4,6 +4,7 @@
 #include <functional>
 #include <unordered_map>
 #include <memory>
+#include "Logger.h"
 
 using namespace std;
 using DataType = shared_ptr<Data>;
@@ -16,16 +17,24 @@ public:
 	bool HanleEvent(KEY key, EnventType event, DataType data = nullptr) {
 		if (m_StateMachineHandler.find(key) == m_StateMachineHandler.end())
 		{
+			// Start from start node
 			m_StateMachineHandler[key] = m_StartState;
 		}
 		auto& currentState = m_StateMachineHandler[key];
-		auto itr = m_mapGraph.find(currentState);
-		if (itr == m_mapGraph.end())
+		auto itrStart = m_mapGraph.find(currentState);
+		if (itrStart == m_mapGraph.end())
 		{
-			// log "state is not registered"
+			LOG("State is not registered");
 			return false;
 		}
-		StateFunctor& handler = itr->second[event];
+		auto startNode = itrStart->second;
+		auto itr = startNode.find(event);
+		if (itr != startNode.end())
+		{
+			LOG("Edge is existed for start node");
+			return false;
+		}
+		auto& handler = itr->second;
 
 		auto& start = m_mapStateStore[currentState];
 		auto& end = m_mapStateStore[handler.m_end];
@@ -48,13 +57,22 @@ public:
 	}
 	bool Connect(StateType start, StateType end, EnventType event, Handler func = nullptr)
 	{
-		auto itr = m_mapGraph.find(start);
-		if (itr == m_mapGraph.end())
+		auto itrStart = m_mapGraph.find(start);
+		if (itrStart == m_mapGraph.end())
 		{
-			// log "state is not registered"
+			LOG("State is not registered");
 			return false;
 		}
-		itr->second[event] = { end, func };
+
+		auto startNode = itrStart->second;
+		auto itr = startNode.find(event);
+		if (itr != startNode.end())
+		{
+			LOG("edge is existed for start node");
+			return false;
+		}
+
+		startNode[event] = { end, func };
 		return true;
 	}
 	bool AddState(StateType stateType) {
@@ -77,7 +95,7 @@ public:
 		auto stateType = state->GetState();
 		if (m_mapGraph.find(stateType) != m_mapGraph.end())
 		{
-			// log "state is added before"
+			LOG("State is added before");
 			return false;
 		}
 		m_mapGraph[stateType] = unordered_map<Event, StateFunctor>();
